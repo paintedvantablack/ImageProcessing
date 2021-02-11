@@ -20,7 +20,6 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Diagnostics;
 
-using System.Threading;
 
 namespace ImageProcessing
 {

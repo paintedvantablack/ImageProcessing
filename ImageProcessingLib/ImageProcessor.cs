@@ -47,11 +47,10 @@ namespace ImageProcessingLib
         private List<Pair> orderedPairs;    // Упорядоченный по распространенности список пар пикселей
         private bool[,] _regularPartMask;   // Маска для отображение регулярной части изображения
 
-        public bool isIrregular { get; set; }        // Отображать маской регулярную часть?
+        public bool isIrregular { get; set; }        // Отображать маской нерегулярную часть?
 
         // Делегаты
         public delegate void ChangedSomething();
-
         private event ChangedSomething imageLoaded;
         public void RegisterImageLoaded(params ChangedSomething[] dels)
         {
@@ -60,6 +59,7 @@ namespace ImageProcessingLib
                 imageLoaded += del;
             }
         }
+
         private event ChangedSomething shadesChanged;
         public void RegisterShadesChanged(params ChangedSomething[] dels)
         {
@@ -145,7 +145,7 @@ namespace ImageProcessingLib
             });
         }
 
-        //Построение упрощенного массива
+        // Построение упрощенного массива
         private void BuildArraySimplified()
         {
             int fragmentation = 256 / (shades - 1);
@@ -176,6 +176,7 @@ namespace ImageProcessingLib
             });
         }
 
+        // Построение матрицы смежности
         private void BuildAdjacencyMatrix()
         {
             _adjacencyMatrix = new int[shades, shades];
@@ -223,7 +224,7 @@ namespace ImageProcessingLib
             orderedPairs.Sort();
         }
 
-        //Построение маски регулирной части
+        // Построение маски регулирной части
         private void BuildRegularPartMask()
         {
             _regularPartMask = new bool[_arraySimplified.GetLength(0), _arraySimplified.GetLength(1)];
@@ -253,27 +254,27 @@ namespace ImageProcessingLib
         public Bitmap GetBitmapSimplified()
         { return GetBitmap(2); }
 
-        private Bitmap GetBitmap2(byte stage)
-        {
-            short[,] arrBufer = default;
-            switch (stage)
-            {
-                case 0: // Изначальное изображение
-                    arrBufer = _arrayOriginal;
-                    break;
-                case 1: // Нормализованное изображение
-                    arrBufer = _arrayNormalised;
-                    break;
-                case 2: // Упрощенное изображение
-                    arrBufer = _arraySimplified;
-                    break;
-            }
-            Bitmap result = new Bitmap(arrBufer.GetLength(1), arrBufer.GetLength(0));
-            for (int i = 0; i < arrBufer.GetLength(0); ++i)
-                for (int j = 0; j < arrBufer.GetLength(1); ++j)
-                    result.SetPixel(j, i, Color.FromArgb(255, arrBufer[i, j] - 1, arrBufer[i, j] - 1, arrBufer[i, j] - 1));
-            return result;
-        }
+        //private Bitmap GetBitmap2(byte stage)
+        //{
+        //    short[,] arrBufer = default;
+        //    switch (stage)
+        //    {
+        //        case 0: // Изначальное изображение
+        //            arrBufer = _arrayOriginal;
+        //            break;
+        //        case 1: // Нормализованное изображение
+        //            arrBufer = _arrayNormalised;
+        //            break;
+        //        case 2: // Упрощенное изображение
+        //            arrBufer = _arraySimplified;
+        //            break;
+        //    }
+        //    Bitmap result = new Bitmap(arrBufer.GetLength(1), arrBufer.GetLength(0));
+        //    for (int i = 0; i < arrBufer.GetLength(0); ++i)
+        //        for (int j = 0; j < arrBufer.GetLength(1); ++j)
+        //            result.SetPixel(j, i, Color.FromArgb(255, arrBufer[i, j] - 1, arrBufer[i, j] - 1, arrBufer[i, j] - 1));
+        //    return result;
+        //}
 
         private Bitmap GetBitmap(byte stage)
         {
@@ -316,8 +317,6 @@ namespace ImageProcessingLib
                     }
                 });
 
-
-
                 return result;
             }
         }
@@ -331,7 +330,7 @@ namespace ImageProcessingLib
 
             Bitmap result = new Bitmap(shades, shades);
 
-            // Раскрашивание битмапа: МИНИМУМ> черный-синий-голубой-зелёный-жёлтый-красный-белый <МАКСИМУМ
+            // Раскрашивание битмапа матрицы смежности: МИНИМУМ> черный-синий-голубой-зелёный-жёлтый-красный-белый <МАКСИМУМ
             for (int i = 0; i < _adjacencyMatrix.GetLength(0); ++i)
             { 
                 for (int j = 0; j < _adjacencyMatrix.GetLength(1); ++j)
